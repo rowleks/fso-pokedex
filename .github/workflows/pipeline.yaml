@@ -14,13 +14,14 @@ jobs:
         with:
           node-version: '20'
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       - name: Check style
         run: npm run lint:fix
       - name: Build
         run: npm run build
-      - name: Test
+      - name: Jest unit tests
         run: npm test
-      - name: e2e tests
+      - name: Install playwright dependencies
+        run: npx playwright install --with-deps
+      - name: Playwright e2e tests
         run: npm run test:e2e
-    
