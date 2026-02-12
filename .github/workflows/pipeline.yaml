@@ -16,9 +16,11 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Check style
-        run: npm run eslint
+        run: npm run lint:fix
       - name: Build
         run: npm run build
       - name: Test
         run: npm test
+      - name: e2e tests
+        run: npm run test:e2e
     
