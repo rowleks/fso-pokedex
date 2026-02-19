@@ -22,7 +22,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          # Speed up dependency installation by caching them
           cache: 'npm'
 
       - name: Install dependencies
@@ -57,17 +56,6 @@ jobs:
         id: deploy
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
 
-      # The following steps run only if a previous step has failed
-      - name: Failure Notify (Discord)
-        if: failure()
-        uses: sarisia/actions-status-discord@v1
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          nodetail: true
-          title: 'Build & Test Failed'
-          description: 'Commit ${{ github.event.head_commit.url }} by ${{ github.event.head_commit.author.username }} broke the build.'
-          color: 0xff0000
-
   tag_release:
     # This job runs only after a successful deployment
     needs: build_and_test
@@ -76,7 +64,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # fetch-depth: 0 is required for the tagging action to get all history
           fetch-depth: 0
 
       - name: Github Tag Bump
@@ -86,19 +73,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_PREFIX: 'v'
           #DEFAULT_BUMP: 'patch'
-
-      - name: Format success timestamp
-        id: ts
-        run: echo "timestamp=$(date +%s)" >> $GITHUB_OUTPUT
-
-      - name: Success Notify (Discord)
-        uses: sarisia/actions-status-discord@v1
-        if: success()
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          nodetail: true
-          title: 'New version of `software` is ready!'
-          description: |
-            Version `${{ steps.bump.outputs.new_tag }}`
-            Click [here](${{ github.event.head_commit.url }}) to download!
-          color: 0x00ff00
