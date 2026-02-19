@@ -32,8 +32,9 @@ jobs:
         run: npm run lint
 
       - name: Build
-        run: npm run build
-
+        run: |
+          chmod +x build.sh
+          ./build.sh
       - name: Jest unit tests
         run: npm test
 
